@@ -333,4 +333,103 @@ function labSqli(){
 }
 </script>
 
+
+<!-- AI Cyber Assistant -->
+<section id="ai-assistant" style="margin:24px 0;padding:22px;border:1px solid rgba(100,180,255,.28);border-radius:20px;background:linear-gradient(135deg,rgba(10,20,40,.96),rgba(12,32,55,.92));color:#eef7ff;box-shadow:0 15px 45px rgba(0,0,0,.25)">
+  <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
+    <div>
+      <h2 style="margin:0 0 6px">🤖 AI Cyber Assistant</h2>
+      <div style="opacity:.75;font-size:13px">مساعد للمحادثة، البرمجة، تحليل الأكواد، OSINT المصرح به والتعلّم الأمني.</div>
+    </div>
+    <button id="ai-clear" style="padding:9px 13px;border-radius:10px;border:1px solid #40627e;background:#102338;color:#fff">مسح المحادثة</button>
+  </div>
+
+  <div id="ai-messages" style="height:390px;overflow:auto;margin:18px 0;padding:14px;border-radius:14px;background:#07111d;border:1px solid rgba(255,255,255,.08)">
+    <div class="ai-msg ai-bot" style="max-width:88%;margin:8px 0;padding:12px 14px;border-radius:14px;background:#10283c;white-space:pre-wrap">مرحبًا 👋 أنا مساعدك الذكي. اكتب سؤالك في البرمجة أو الأمن السيبراني أو OSINT المصرّح به.</div>
+  </div>
+
+  <div style="display:flex;gap:8px">
+    <textarea id="ai-input" rows="2" placeholder="اكتب سؤالك هنا..." style="flex:1;resize:vertical;padding:12px;border-radius:12px;border:1px solid #31506a;background:#081522;color:#fff;font:inherit"></textarea>
+    <button id="ai-send" style="align-self:stretch;padding:0 18px;border:0;border-radius:12px;background:#1877d2;color:white;font-weight:700">إرسال</button>
+  </div>
+  <div style="margin-top:9px;font-size:12px;opacity:.6">
+    ملاحظة: هذه الواجهة لا تحتوي مفتاح API بداخلها. للذكاء الاصطناعي الحقيقي اربطها بخادم Backend آمن.
+  </div>
+</section>
+
+<script>
+(() => {
+  const box = document.getElementById('ai-messages');
+  const input = document.getElementById('ai-input');
+  const send = document.getElementById('ai-send');
+  const clear = document.getElementById('ai-clear');
+
+  // ضع رابط الـBackend الخاص بك هنا بعد إنشائه.
+  // مثال: https://your-server.example/api/chat
+  const API_URL = "";
+
+  function addMessage(text, who) {
+    const el = document.createElement('div');
+    el.className = 'ai-msg ' + (who === 'user' ? 'ai-user' : 'ai-bot');
+    el.style.cssText = `
+      max-width:88%;margin:8px 0;padding:12px 14px;border-radius:14px;
+      white-space:pre-wrap;line-height:1.6;
+      ${who === 'user'
+        ? 'margin-right:auto;background:#155a91'
+        : 'margin-left:auto;background:#10283c'}
+    `;
+    el.textContent = text;
+    box.appendChild(el);
+    box.scrollTop = box.scrollHeight;
+    return el;
+  }
+
+  async function ask() {
+    const q = input.value.trim();
+    if (!q) return;
+    addMessage(q, 'user');
+    input.value = '';
+    send.disabled = true;
+
+    if (!API_URL) {
+      addMessage(
+        'الواجهة جاهزة ✅\n\nلكن لم يتم وضع رابط Backend بعد، لأن وضع مفتاح الذكاء الاصطناعي داخل HTML المنشور على GitHub سيكشف المفتاح لأي شخص يفتح الموقع.\n\nاربط API_URL بخادمك الآمن، وسيصبح الشات قادرًا على إرسال الأسئلة واستقبال الإجابات.',
+        'bot'
+      );
+      send.disabled = false;
+      return;
+    }
+
+    const loading = addMessage('جارٍ التفكير…', 'bot');
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({message:q})
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      loading.textContent = data.reply || data.message || 'لم تصل إجابة.';
+    } catch (e) {
+      loading.textContent = 'تعذر الاتصال بالخادم. تأكد من رابط الـBackend وإعدادات CORS.';
+    } finally {
+      send.disabled = false;
+      input.focus();
+    }
+  }
+
+  send.addEventListener('click', ask);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      ask();
+    }
+  });
+  clear.addEventListener('click', () => {
+    box.innerHTML = '';
+    addMessage('تم مسح المحادثة. اكتب سؤالك الجديد 👋', 'bot');
+  });
+})();
+</script>
+
 </body></html>
