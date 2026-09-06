@@ -19,6 +19,107 @@ table{width:100%;border-collapse:collapse;font-size:11px}td,th{border-bottom:1px
 @media(max-width:700px){main{padding:11px}.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.hero{border-radius:19px;padding:17px}.bottom{grid-template-columns:repeat(5,1fr)}.bottom button{padding:7px 2px}}
 </style></head>
 <body>
+
+<style id="auth-style">
+#authGate{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;
+background:radial-gradient(circle at 50% 15%,#12386b55,transparent 45%),#02050a;
+padding:20px}
+#authBox{width:min(430px,100%);background:#08111d;border:1px solid #29415f;
+border-radius:24px;padding:24px;box-shadow:0 25px 90px #000c;text-align:center}
+#authBox .shield{font-size:42px;margin-bottom:8px}
+#authBox h2{margin:0 0 6px}
+#authBox p{color:#8da0b8;font-size:12px;line-height:1.7;margin:0 0 16px}
+#authPass{margin:0 0 8px;text-align:center;letter-spacing:5px;font-weight:800}
+#authBtn{width:100%;margin-top:5px}
+#authMsg{min-height:20px;margin-top:10px;font-size:11px}
+.auth-error{color:#ff637d}.auth-ok{color:#32d583}
+</style>
+<div id="authGate" role="dialog" aria-modal="true" aria-label="تسجيل الدخول">
+  <div id="authBox">
+    <div class="shield">🔐</div>
+    <h2>دخول مركز الأمن السيبراني</h2>
+    <p>أدخل كلمة المرور للوصول إلى الأدوات المحلية.</p>
+    <input id="authPass" type="password" inputmode="numeric" autocomplete="off"
+           maxlength="32" placeholder="كلمة المرور">
+    <button id="authBtn" class="btn primary">دخول آمن</button>
+    <div id="authMsg"></div>
+  </div>
+</div>
+<script>
+(function(){
+  const PASS_HASH = "483029d526219f816e8e8f6a9de07b422633dba180ffc26faac22862a017519f"; 
+  // يتم استبداله تلقائياً بالـ SHA-256 الحقيقي لكلمة 2004 أدناه.
+  const gate = document.getElementById('authGate');
+  const input = document.getElementById('authPass');
+  const btn = document.getElementById('authBtn');
+  const msg = document.getElementById('authMsg');
+  const KEY = 'cyberlab_auth_ok_v1';
+  const FAIL = 'cyberlab_auth_fail_v1';
+  const LOCK = 'cyberlab_auth_lock_v1';
+  const MAX_FAILS = 5, LOCK_MS = 30000;
+
+  async function sha256(text){
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return [...new Uint8Array(buf)].map(x=>x.toString(16).padStart(2,'0')).join('');
+  }
+
+  function setMsg(t, ok=false){
+    msg.textContent=t;
+    msg.className=ok?'auth-ok':'auth-error';
+  }
+
+  function lockRemaining(){
+    const until = +(localStorage.getItem(LOCK)||0);
+    return Math.max(0, until-Date.now());
+  }
+
+  function renderLock(){
+    const left=lockRemaining();
+    if(left>0){
+      btn.disabled=true; input.disabled=true;
+      setMsg('محاولات كثيرة. أعد المحاولة بعد '+Math.ceil(left/1000)+' ثانية.');
+      setTimeout(renderLock,1000);
+    }else{
+      btn.disabled=false; input.disabled=false;
+      if(msg.textContent.includes('محاولات كثيرة')) setMsg('');
+    }
+  }
+
+  async function login(){
+    if(lockRemaining()>0){renderLock();return;}
+    const value=input.value;
+    if(!value){setMsg('أدخل كلمة المرور.');return;}
+    const hash=await sha256(value);
+    if(hash===PASS_HASH){
+      localStorage.setItem(KEY,'1');
+      localStorage.removeItem(FAIL);
+      localStorage.removeItem(LOCK);
+      gate.remove();
+      return;
+    }
+    let fails=(+(localStorage.getItem(FAIL)||0))+1;
+    localStorage.setItem(FAIL,String(fails));
+    input.value='';
+    if(fails>=MAX_FAILS){
+      localStorage.setItem(LOCK,String(Date.now()+LOCK_MS));
+      localStorage.setItem(FAIL,'0');
+      renderLock();
+    }else{
+      setMsg('كلمة المرور غير صحيحة. المحاولة '+fails+' من '+MAX_FAILS+'.');
+    }
+  }
+
+  if(localStorage.getItem(KEY)==='1'){
+    gate.remove();
+  }else{
+    renderLock();
+    btn.addEventListener('click',login);
+    input.addEventListener('keydown',e=>{if(e.key==='Enter')login();});
+    setTimeout(()=>input.focus(),100);
+  }
+})();
+</script>
+
 <div class="wrap">
 <header><div class="head"><div class="brand"><div class="logo">🛡️</div><div><b>مركز الأمن السيبراني و OSINT</b><small>الإصدار 3 • منصة أمنية محلية</small></div></div><div class="state">● الوضع الآمن</div></div></header>
 <main>
@@ -89,7 +190,7 @@ function queryإنشاء(){let d=$('sq').value.trim(),t=$('sqType').value,q=t===
 function siteSafe(d){return '\"'+d+'\" public mentions'}
 function certSearch(){let d=targetDomain($('cert').value);openSearch('https://crt.sh/?q='+encodeURIComponent(d));$('certOut').textContent='Certificate transparency  وتم فتح البحث for '+d}
 function metadata(){let a=$('meta').value.split(/\\r?\\n/).filter(Boolean);$('metaOut').textContent='الحقول: '+a.length+'\\n'+a.map(x=>'• '+x).join('\\n')}
-function normalizeIdent(){let v=$('ident').value.trim(),t=$('identType').value;if(t==='email')v=v.toLowerالقضية();if(t==='domain')v=targetDomain(v).toLowerالقضية();if(t==='username')v=v.replace(/^@/,'').toLowerالقضية();$('identOut').textContent=v}
+function normalizeIdent(){let v=$('ident').value.trim(),t=$('identType').value;if(t==='email')v=v.toLowerCase();if(t==='domain')v=targetDomain(v).toLowerCase();if(t==='username')v=v.replace(/^@/,'').toLowerCase();$('identOut').textContent=v}
 function dnsOpen(type){let d=targetDomain($('dns').value);openSearch('https://dns.google/resolve?name='+encodeURIComponent(d)+'&type='+type);$('dnsOut').textContent='تم فتح Google Public DNS query: '+type+' '+d}
 function headerOpen(){let u=$('headTarget').value.trim();openSearch('https://securityheaders.com/?q='+encodeURIComponent(u)+'&followRedirects=on');$('headOut').textContent='تم فتح رؤوس الحماية analysis. استخدمه فقط مع الأصول المصرح بها.'}
 function redirects(){let a=$('redir').value.split(/->|→/).map(x=>x.trim()).filter(Boolean);$('redirOut').textContent='Hops: '+Math.max(0,a.length-1)+'\\n'+a.map((x,i)=>(i+1)+'. '+x).join('\\n')}
@@ -98,7 +199,7 @@ function xssالمختبر(s){let v=$('xss').value;if(s){v=v.replace(/&/g,'&amp;
 function sqliالمختبر(){let v=$('sqli').value,hit=/(\\bor\\b|\\band\\b|--|;|'|\\/\\*)/i.test(v);$('sqliO').textContent=hit?'Suspicious حقن SQL pattern detected.\\nالدرس: Prepared Statements + server-side validation.':'No obvious pattern.\\nThis is not a real database.'}
 function idor(){let u=+$('idorU').value,r=+$('idorR').value,owner=r===1001?100:r===2001?200:0;$('idorO').textContent=owner===u?'200 OK — authorized owner.':'403 — authorization should reject this resource.'}
 function csrf(){let x=$('csrfM').value;$('csrfO').textContent=x.includes('بدون')?'محاكاة: النظام معرض للخطر: request lacks anti-CSRF protection.':'محاكاة: النظام محمي: request includes a CSRF token.'}
-function ssrf(){let v=$('ssrf').value.toLowerالقضية(),bad=/localhost|127\\.0\\.0\\.1|169\\.254\\.169\\.254|\\[::1\\]|\\.internal\\b/.test(v);$('ssrfO').textContent=bad?'BLOCK in lab: destination resembles internal/local address.\\nالدرس: allowlist destinations and validate resolved IPs.':'Review destination against an explicit allowlist before making server-side requests.'}
+function ssrf(){let v=$('ssrf').value.toLowerCase(),bad=/localhost|127\\.0\\.0\\.1|169\\.254\\.169\\.254|\\[::1\\]|\\.internal\\b/.test(v);$('ssrfO').textContent=bad?'BLOCK in lab: destination resembles internal/local address.\\nالدرس: allowlist destinations and validate resolved IPs.':'Review destination against an explicit allowlist before making server-side requests.'}
 function authالمختبر(){let n=+$('attempts').value;$('authO').textContent=n>5?'يجب تفعيل تحديد المعدل after repeated failures. Add MFA and monitoring.':'Within example threshold; real systems need server-side controls.'}
 function b64d(s){return decodeURIComponent(escape(atob(s)))}function jwtفك الترميز(){try{let p=$('jwtالمختبر').value.split('.');$('jwtO').textContent='الرأس\\n'+JSON.stringify(JSON.parse(b64d(p[0].replace(/-/g,'+').replace(/_/g,'/'))),null,2)+'\\nالبيانات\\n'+JSON.stringify(JSON.parse(b64d(p[1].replace(/-/g,'+').replace(/_/g,'/'))),null,2)+'\\n\\nفك الترميز لا يعني التحقق من التوقيع'}catch(e){$('jwtO').textContent='JWT غير صالح'}}
 function ctf(){let m=$('ctfI').value.match(/^K9-(\\d)(\\d)(\\d)$/);$('ctfO').textContent=m&&(+m[1]+ +m[2]+ +m[3]===15)?'🎉 العَلَم صحيح!':'❌ غير صحيح.'}
@@ -107,9 +208,129 @@ function password(){let n=Math.min(80,Math.max(8,+$('plen').value||24)),c='ABCDE
 function jsonFmt(){try{$('jsonO').textContent=JSON.stringify(JSON.parse($('json').value),null,2)}catch(e){$('jsonO').textContent='JSON غير صالح'}}
 function codec(){let v=$('codecI').value,m=$('codec').value,r='';try{r=m==='b64e'?btoa(unescape(encodeURIComponent(v))):m==='b64d'?b64d(v):m==='ue'?encodeURIComponent(v):decodeURIComponent(v)}catch(e){r='إدخال غير صالح'}$('codecO').textContent=r}
 function httpإنشاء(){$('httpO').textContent=$('hm').value+' '+($('hp').value||'/')+' HTTP/1.1\\nHost: lab.local\\nContent-Type: application/json\\n'+($('hb').value?'\\n'+$('hb').value:'')}
-function saveالقضية(){let t=$('cTitle').value.trim(),n=$('cملاحظة').value.trim();if(!t)return;let a=JSON.parse(localStorage.getItem('cyberالقضيةs')||'[]');a.push({t,n,d:new التاريخ().toLocaleString()});localStorage.setItem('cyberالقضيةs',JSON.stringify(a));renderالقضيةs();$('cTitle').value='';$('cملاحظة').value=''}
+function saveالقضية(){let t=$('cTitle').value.trim(),n=$('cملاحظة').value.trim();if(!t)return;let a=JSON.parse(localStorage.getItem('cyberالقضيةs')||'[]');a.push({t,n,d:new Date().toLocaleString()});localStorage.setItem('cyberالقضيةs',JSON.stringify(a));renderالقضيةs();$('cTitle').value='';$('cملاحظة').value=''}
 function clearالقضيةs(){if(confirm('حذف كل الـالقضيةs المحلية؟')){localStorage.removeItem('cyberالقضيةs');renderالقضيةs()}}
 function renderالقضيةs(){let a=JSON.parse(localStorage.getItem('cyberالقضيةs')||'[]');$('caseCount').textContent=a.length;if(!a.length){$('caseTable').textContent='لا توجد القضيةs محفوظة.';return}$('caseTable').innerHTML='<table><tr><th>القضية</th><th>ملاحظة</th><th>التاريخ</th></tr>'+a.map(x=>'<tr><td>'+esc(x.t)+'</td><td>'+esc(x.n)+'</td><td>'+esc(x.d)+'</td></tr>').join('')+'</table>'}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
 renderالقضيةs();
-</script></body></html>
+</script>
+<style>
+.pro-panel{margin:18px 0;padding:18px;border:1px solid #29415f;border-radius:18px;background:#07101b}
+.pro-panel h3{margin:0 0 10px}.pro-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.pro-card{padding:14px;border:1px solid #20344b;border-radius:14px;background:#091522}
+.pro-card input,.pro-card textarea,.pro-card select{width:100%;box-sizing:border-box;margin:7px 0;padding:10px;border-radius:9px}
+.pro-card button{margin:4px 4px 4px 0}.pro-out{white-space:pre-wrap;word-break:break-word;margin-top:8px;padding:10px;border-radius:9px;background:#02070d;color:#b8c7d9;font:12px ui-monospace,monospace;min-height:20px}
+</style>
+<section class="pro-panel" id="proToolkit">
+<h2>🛡️ CyberLab Pro — أدوات عملية آمنة</h2>
+<p>للبرمجة، تدقيق كلمات المرور الخاصة بك، وتحليل الأصول التي تملكها أو لديك تصريح لاختبارها.</p>
+<div class="pro-grid">
+
+<div class="pro-card">
+<h3>🔑 Password Audit</h3>
+<input id="pwA" type="password" placeholder="أدخل كلمة مرورك للاختبار المحلي">
+<button class="btn primary" onclick="pwAudit()">تحليل القوة</button>
+<div id="pwAO" class="pro-out"></div>
+</div>
+
+<div class="pro-card">
+<h3>🎲 Password Generator</h3>
+<input id="pwLen" type="number" min="12" max="80" value="24" placeholder="الطول">
+<button class="btn primary" onclick="pwGenPro()">توليد</button>
+<div id="pwGO" class="pro-out"></div>
+</div>
+
+<div class="pro-card">
+<h3>🧮 SHA-256</h3>
+<input id="pwHash" type="text" placeholder="نص للاختبار">
+<button class="btn primary" onclick="pwHashPro()">Hash</button>
+<div id="pwHO" class="pro-out"></div>
+</div>
+
+<div class="pro-card">
+<h3>🌐 URL / Domain Analyzer</h3>
+<input id="urlPro" type="text" placeholder="https://example.com/path">
+<button class="btn primary" onclick="urlProAnalyze()">تحليل</button>
+<div id="urlPO" class="pro-out"></div>
+</div>
+
+<div class="pro-card">
+<h3>🔎 OSINT Links</h3>
+<input id="osintQ" type="text" placeholder="username أو domain">
+<button onclick="osintOpen('google')">Google</button>
+<button onclick="osintOpen('crt')">Certificate Transparency</button>
+<button onclick="osintOpen('security')">Security Headers</button>
+<div id="osintO" class="pro-out">تفتح خدمات عامة للتحقق من أصول مصرح لك بها.</div>
+</div>
+
+<div class="pro-card">
+<h3>🧪 XSS / SQLi Lab</h3>
+<textarea id="labIn" rows="3" placeholder="ضع payload تجريبي هنا"></textarea>
+<button onclick="labXss()">XSS Safe Test</button>
+<button onclick="labSqli()">SQLi Pattern Test</button>
+<div id="labO" class="pro-out"></div>
+</div>
+
+</div>
+</section>
+
+<script>
+async function pwHashPro(){
+  const v=document.getElementById('pwHash').value;
+  const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v));
+  document.getElementById('pwHO').textContent=[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+function pwAudit(){
+  const p=document.getElementById('pwA').value;
+  let s=0, tips=[];
+  if(p.length>=12)s+=2; else tips.push('اجعلها 12 حرفاً أو أكثر');
+  if(/[a-z]/.test(p))s++;
+  if(/[A-Z]/.test(p))s++;
+  if(/\d/.test(p))s++;
+  if(/[^A-Za-z0-9]/.test(p))s++;
+  if(/(.)\1\1/.test(p))tips.push('تجنب تكرار نفس الحرف 3 مرات');
+  if(/^(password|123456|qwerty|2004)$/i.test(p))tips.push('هذه كلمة مرور شائعة ولا يُنصح بها');
+  const level=s>=6?'قوية':s>=4?'متوسطة':'ضعيفة';
+  document.getElementById('pwAO').textContent='القوة: '+level+'\nالنقاط: '+s+'/6'+(tips.length?'\nنصائح:\n• '+tips.join('\n• '):'\nلا توجد ملاحظات أساسية.');
+}
+function pwGenPro(){
+  const n=Math.min(80,Math.max(12,+document.getElementById('pwLen').value||24));
+  const c='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*_-+=';
+  const a=new Uint32Array(n); crypto.getRandomValues(a);
+  document.getElementById('pwGO').textContent=[...a].map(x=>c[x%c.length]).join('');
+}
+function urlProAnalyze(){
+  try{
+    const raw=document.getElementById('urlPro').value.trim();
+    const u=new URL(raw.includes('://')?raw:'https://'+raw);
+    document.getElementById('urlPO').textContent=
+      'Protocol: '+u.protocol+'\nHostname: '+u.hostname+
+      '\nPort: '+(u.port||'default')+'\nPath: '+u.pathname+
+      '\nQuery: '+(u.search||'none')+'\nFragment: '+(u.hash||'none');
+  }catch(e){document.getElementById('urlPO').textContent='الرابط غير صالح';}
+}
+function osintOpen(type){
+  const q=document.getElementById('osintQ').value.trim();
+  if(!q)return;
+  let u='';
+  if(type==='google')u='https://www.google.com/search?q='+encodeURIComponent('"'+q+'"');
+  if(type==='crt')u='https://crt.sh/?q='+encodeURIComponent(q);
+  if(type==='security')u='https://securityheaders.com/?q='+encodeURIComponent(q)+'&followRedirects=on';
+  window.open(u,'_blank','noopener,noreferrer');
+}
+function labXss(){
+  const v=document.getElementById('labIn').value;
+  const safe=v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  document.getElementById('labO').textContent='Safe encoded output:\n'+safe+
+    '\n\nالدرس: لا تضع مدخلات المستخدم مباشرة داخل innerHTML.';
+}
+function labSqli(){
+  const v=document.getElementById('labIn').value;
+  const hit=/(\bor\b|\band\b|--|;|'|\/\*)/i.test(v);
+  document.getElementById('labO').textContent=hit?
+    'تم اكتشاف نمط SQLi محتمل في المختبر.\nاستخدم Prepared Statements والتحقق على الخادم.':
+    'لا يوجد نمط واضح.\nهذا اختبار نمط فقط وليس اتصالاً بقاعدة بيانات.';
+}
+</script>
+
+</body></html>
