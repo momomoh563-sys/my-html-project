@@ -32,6 +32,7 @@ body{direction:rtl}.app{width:100%;min-height:100vh;background:#fff}
 .action{width:100%;height:46px;border-radius:7px;margin-top:9px;font-size:15px;font-weight:800;border:1px solid}.save{background:#20a94d;color:#fff;border-color:#20a94d}.print{background:#fff;color:#23416c;border-color:#3e78ce}.clear{background:#fff;color:#e33d4c;border-color:#e33d4c}
 .bottom-actions{display:flex;gap:10px;margin-top:12px}.bottom-actions button{height:45px;border:0;border-radius:7px;padding:0 30px;font-weight:800;font-size:14px}.add{background:#177be8;color:#fff}.edit{background:#f2a51a;color:#fff}.delete{background:#9aa9bd;color:#fff}
 .footer{height:40px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:12px;color:#5c6a80}.dot{display:inline-block;width:9px;height:9px;background:#19b65b;border-radius:50%;margin-right:5px}
+.product-list{width:100%}.product-row{display:grid;grid-template-columns:80px 1.7fr 120px 110px 120px 75px;border-bottom:1px solid #e5eaf2;align-items:center;text-align:center;min-height:58px;font-size:14px}.product-row>div{padding:9px 7px;border-left:1px solid #eef1f5}.product-row strong{display:block;text-align:right}.product-row small{display:block;text-align:right;color:#718096;font-size:11px;margin-top:3px}
 @media(max-width:850px){.header{height:auto;padding:14px 16px}.brand{font-size:21px}.sub{font-size:11px}.clock,.header-btn{display:none}.content{padding:12px}.menu-grid{grid-template-columns:repeat(3,1fr);gap:9px}.card{min-height:83px;padding:12px 5px}.card .ico{font-size:25px}.card h3{font-size:14px}.search-row{grid-template-columns:1fr 1fr}.search-wrap{grid-column:1/-1}.workspace{grid-template-columns:1fr}.side{order:-1}.table-box{min-height:320px}.table-head{font-size:11px}.table-head div{padding:8px 4px}.bottom-actions{overflow:auto}.bottom-actions button{padding:0 18px;white-space:nowrap}.footer{padding:0 12px}}
 </style>
 </head>
@@ -56,7 +57,11 @@ body{direction:rtl}.app{width:100%;min-height:100vh;background:#fff}
 </div>
 <div class="workspace">
 <section><div class="table-box"><div class="table-head"><div>#</div><div>المنتج</div><div>الكمية</div><div>سعر البيع</div><div>الإجمالي</div><div>حذف</div></div>
-<div class="empty"><div><div class="cart">🛒</div><strong>لا توجد منتجات بعد</strong><span>قم بإضافة المنتجات لبدء عملية البيع</span></div></div></div>
+<div class="product-list">
+  <div class="product-row"><div>1</div><div><strong>cable iPhone</strong><small>الكمية المتوفرة: 10</small></div><div>10</div><div>— دج</div><div>0.00 دج</div><div>🗑️</div></div>
+  <div class="product-row"><div>2</div><div><strong>cable TEPC</strong><small>الكمية المتوفرة: 10</small></div><div>10</div><div>— دج</div><div>0.00 دج</div><div>🗑️</div></div>
+  <div class="product-row"><div>3</div><div><strong>CABLE LUNA</strong><small>الكمية المتوفرة: 10</small></div><div>10</div><div>— دج</div><div>0.00 دج</div><div>🗑️</div></div>
+</div></div>
 <div class="bottom-actions"><button class="add" id="addProduct">＋ إضافة منتج</button><button class="edit">✎ تعديل الكمية</button><button class="delete">♜ حذف المنتج</button></div></section>
 <aside class="side"><div class="total"><small>المجموع الكلي</small><b>0.00</b> دج</div><div class="side-stat green"><span>عدد المنتجات 🛒</span><b>0</b></div><div class="side-stat blue"><span>الربح المتوقع 💰</span><b>0.00</b></div><div class="side-stat purple"><span>الخصم %</span><b>0.00</b></div>
 <button class="action save">▣ حفظ البيع</button><button class="action print">▣ طباعة الفاتورة</button><button class="action clear">▥ مسح الكل</button></aside>
