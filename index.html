@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>WALID PHONE</title>
+<style>
+*{box-sizing:border-box}
+:root{--blue:#1877e8;--green:#23a653;--orange:#f4a51c;--purple:#814be8;--cyan:#19a7b7;--red:#ef5360;--line:#d7dee9;--text:#172033}
+html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;background:#eef2f7;color:var(--text)}
+body{direction:rtl}.app{width:100%;min-height:100vh;background:#fff}
+.header{height:76px;background:linear-gradient(90deg,#0878ee,#2383e8);color:#fff;padding:0 28px;display:flex;align-items:center}
+.header-row{width:100%;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.brand-wrap{display:flex;align-items:center;gap:13px}.logo{width:42px;height:42px;border-radius:10px;background:#fff;color:#1677e8;display:grid;place-items:center;font-size:23px;font-weight:900}
+.brand{font-size:26px;font-weight:800}.sub{font-size:13px;opacity:.9;margin-top:2px}
+.header-tools{display:flex;align-items:center;gap:14px}.clock{font-size:16px;font-weight:700;text-align:center;line-height:1.2}
+.header-btn{border:0;background:transparent;color:#fff;font-size:15px;padding:10px 12px}.header-btn span{font-size:21px;margin-left:6px}
+.content{padding:16px 28px 24px;background:#fff}.menu-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;margin-bottom:16px}
+.card{border-radius:10px;padding:16px 12px;min-height:92px;color:#fff;box-shadow:0 2px 5px #00000012;cursor:pointer;text-align:center}
+.card .ico{font-size:31px;line-height:1;margin-bottom:9px}.card h3{margin:0;font-size:18px;font-weight:800}.card p{display:none}
+.card:nth-child(1){background:var(--blue)}.card:nth-child(2){background:var(--green)}.card:nth-child(3){background:var(--orange)}.card:nth-child(4){background:var(--purple)}.card:nth-child(5){background:var(--cyan)}.card:nth-child(6){background:var(--red)}
+.search-row{display:grid;grid-template-columns:1.7fr 1fr 1fr 170px;gap:10px;margin-bottom:12px}
+.search-row input{height:45px;border:1px solid var(--line);border-radius:7px;padding:0 13px;background:#fff;color:#334155;font-size:14px;outline:none}
+.search-wrap{position:relative}.search-wrap input{width:100%;padding-right:42px}.search-icon{position:absolute;right:13px;top:8px;font-size:24px;color:#748196}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) 285px;gap:12px}
+.table-box{border:1px solid var(--line);border-radius:8px;overflow:hidden;min-height:410px}.table-head{display:grid;grid-template-columns:80px 1.7fr 120px 110px 120px 75px;background:#dfe9ff;border-bottom:1px solid #bdcce7;font-weight:800;color:#23385d}
+.table-head div{padding:11px 8px;border-left:1px solid #c6d2e6;text-align:center}
+.empty{min-height:340px;display:grid;place-items:center;text-align:center;color:#8795ad}.empty .cart{font-size:64px;opacity:.7}.empty strong{display:block;font-size:16px;margin-top:8px}.empty span{font-size:13px}
+.side{border:1px solid var(--line);border-radius:8px;padding:12px;background:#fff}.total{background:#101827;color:#fff;border-radius:8px;padding:16px;text-align:center;margin-bottom:10px}.total small{display:block;font-size:13px;margin-bottom:5px}.total b{font-size:35px;color:#79f0a5}
+.side-stat{border-radius:8px;padding:13px 14px;margin:9px 0;display:flex;justify-content:space-between;align-items:center;font-weight:700}.side-stat.green{background:#e1f7e9;color:#17863e}.side-stat.blue{background:#e4f1ff;color:#1169cf}.side-stat.purple{background:#eee6ff;color:#7140cf}.side-stat span{font-size:13px}.side-stat b{font-size:20px}
+.action{width:100%;height:46px;border-radius:7px;margin-top:9px;font-size:15px;font-weight:800;border:1px solid}.save{background:#20a94d;color:#fff;border-color:#20a94d}.print{background:#fff;color:#23416c;border-color:#3e78ce}.clear{background:#fff;color:#e33d4c;border-color:#e33d4c}
+.bottom-actions{display:flex;gap:10px;margin-top:12px}.bottom-actions button{height:45px;border:0;border-radius:7px;padding:0 30px;font-weight:800;font-size:14px}.add{background:#177be8;color:#fff}.edit{background:#f2a51a;color:#fff}.delete{background:#9aa9bd;color:#fff}
+.footer{height:40px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:12px;color:#5c6a80}.dot{display:inline-block;width:9px;height:9px;background:#19b65b;border-radius:50%;margin-right:5px}
+@media(max-width:850px){.header{height:auto;padding:14px 16px}.brand{font-size:21px}.sub{font-size:11px}.clock,.header-btn{display:none}.content{padding:12px}.menu-grid{grid-template-columns:repeat(3,1fr);gap:9px}.card{min-height:83px;padding:12px 5px}.card .ico{font-size:25px}.card h3{font-size:14px}.search-row{grid-template-columns:1fr 1fr}.search-wrap{grid-column:1/-1}.workspace{grid-template-columns:1fr}.side{order:-1}.table-box{min-height:320px}.table-head{font-size:11px}.table-head div{padding:8px 4px}.bottom-actions{overflow:auto}.bottom-actions button{padding:0 18px;white-space:nowrap}.footer{padding:0 12px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="header"><div class="header-row">
+<div class="brand-wrap"><div class="logo">W</div><div><div class="brand">WALID PHONE</div><div class="sub">إدارة المحل بكفاءة وسهولة</div></div></div>
+<div class="header-tools"><div class="clock">2026-09-08<br><span>17:57</span></div><button class="header-btn">📅</button><button class="header-btn"><span>⚙️</span> الإعدادات</button></div>
+</div></header>
+<main class="content">
+<div class="menu-grid">
+<div class="card"><div class="ico">🛒</div><h3>المبيعات</h3></div>
+<div class="card"><div class="ico">📦</div><h3>المخزون</h3></div>
+<div class="card"><div class="ico">💳</div><h3>المصاريف</h3></div>
+<div class="card"><div class="ico">👥</div><h3>الزبائن</h3></div>
+<div class="card" id="profitCard"><div class="ico">📊</div><h3>الحسابات</h3></div>
+<div class="card"><div class="ico">📅</div><h3>التقارير</h3></div>
+</div>
+<div class="search-row">
+<div class="search-wrap"><span class="search-icon">⌕</span><input type="search" placeholder="ابحث عن منتج بالاسم أو الكود ..."></div>
+<input placeholder="الباركود / الكود"><input placeholder="اختر الصنف"><input type="date" value="2026-09-08">
+</div>
+<div class="workspace">
+<section><div class="table-box"><div class="table-head"><div>#</div><div>المنتج</div><div>الكمية</div><div>سعر البيع</div><div>الإجمالي</div><div>حذف</div></div>
+<div class="empty"><div><div class="cart">🛒</div><strong>لا توجد منتجات بعد</strong><span>قم بإضافة المنتجات لبدء عملية البيع</span></div></div></div>
+<div class="bottom-actions"><button class="add" id="addProduct">＋ إضافة منتج</button><button class="edit">✎ تعديل الكمية</button><button class="delete">♜ حذف المنتج</button></div></section>
+<aside class="side"><div class="total"><small>المجموع الكلي</small><b>0.00</b> دج</div><div class="side-stat green"><span>عدد المنتجات 🛒</span><b>0</b></div><div class="side-stat blue"><span>الربح المتوقع 💰</span><b>0.00</b></div><div class="side-stat purple"><span>الخصم %</span><b>0.00</b></div>
+<button class="action save">▣ حفظ البيع</button><button class="action print">▣ طباعة الفاتورة</button><button class="action clear">▥ مسح الكل</button></aside>
+</div></main>
+<footer class="footer"><span>👤 المستخدم : <b>admin</b></span><span>WALID PHONE | نظام تسيير المحل</span><span>البيانات محفوظة تلقائياً <i class="dot"></i></span></footer>
+</div>
+<script>
+const PRIVATE_CODE="0670096728";
+function askPrivateAccess(action){const code=prompt("أدخل الكود السري:");if(code===null)return false;if(code===PRIVATE_CODE){alert(action+" — تم السماح بالدخول.");return true}alert("الكود غير صحيح.");return false}
+document.getElementById("addProduct").addEventListener("click",()=>askPrivateAccess("إضافة منتج"));
+document.getElementById("profitCard").addEventListener("click",()=>askPrivateAccess("الأرباح والحسابات"));
+</script>
+</body>
+</html>
